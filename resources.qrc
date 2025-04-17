@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="Main.qml">qml/Main.qml</file>
+        <file alias="SongDelegate.qml">qml/SongDelegate.qml</file>
+        <file>img/unnamed.jpg</file>
+        <file>img/albumart.jpg</file>
+    </qresource>
+</RCC>
