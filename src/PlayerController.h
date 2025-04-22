@@ -14,7 +14,8 @@ class PlayerController : public QObject {
     Q_PROPERTY(bool playing READ isPlaying NOTIFY playingChanged)
     Q_PROPERTY(int volume READ volume WRITE setVolume NOTIFY volumeChanged)
     Q_PROPERTY(int currentIndex READ currentIndex NOTIFY currentIndexChanged)
-    Q_PROPERTY(int volume READ volume WRITE setVolume NOTIFY volumeChanged)
+    Q_PROPERTY(int artVersion READ artVersion NOTIFY artVersionChanged)
+
 public:
     explicit PlayerController(SongModel* model, QObject *parent = nullptr);
     Q_INVOKABLE void play();
@@ -30,18 +31,25 @@ public:
     int volume() const;
     void setVolume(int vol);
     int currentIndex() const;
+    int artVersion() const { return m_artVersion; }
+
 signals:
     void positionChanged(qint64);
     void durationChanged(qint64);
     void playingChanged(bool);
     void volumeChanged(int);
     void currentIndexChanged(int);
+    void artVersionChanged();
 private:
+    void bumpArtVersion(){ ++m_artVersion; emit artVersionChanged();}
+
     SongModel *m_model;
     QMediaPlayer *m_player;
     QAudioOutput *m_audioOutput;
     QList<QUrl> m_playlist;
     int m_currentIndex{-1};
+    int m_artVersion = 0;
+    bool newSong;
 };
 
 #endif

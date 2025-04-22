@@ -18,7 +18,8 @@ public:
     enum Role { TitleRole = Qt::UserRole+1,
                 ArtistRole,
                 DurationRole,
-                FilePathRole };
+                FilePathRole,
+                AlbumArtRole};
 
     explicit SongModel(QObject *parent = nullptr);
     int rowCount(const QModelIndex &parent = {}) const override;

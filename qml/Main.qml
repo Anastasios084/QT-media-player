@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.3
 import QtQuick.Dialogs
 import QtQml.Models 2.15
 import MediaPlayer 1.0
+// import Qt.labs.platform 1.1
 
 ApplicationWindow {
     visible: true
@@ -47,8 +48,9 @@ ApplicationWindow {
         id: fileDialog
         title: "Select Audio Files"
         nameFilters: ["Audio (*.mp3 *.wav)"]
-        // selectMultiple: true
-        onAccepted: songModel.addSongs(selectedFiles)
+        onAccepted: {
+            songModel.addSongs(selectedFiles)
+        }
     }
 
     // Our C++ proxy model
@@ -58,61 +60,86 @@ ApplicationWindow {
         anchors.fill: parent
         orientation: Qt.Horizontal
 
-        // Song list
-        ListView {
-            id: listView
-            model: proxy
-            clip: true
-            Layout.preferredWidth: 250
-            delegate: SongDelegate { songIndex: index }
-            onCurrentIndexChanged: {
-                var src = proxy.sourceIndex(currentIndex)
-                player.playIndex(src)
-            }
-        }
+        // // Song list (left pane)
+        // ListView {
+        //     id: listView
+        //     model: songModel
+        //     clip: true
+        //     Layout.minimumWidth: 200
+        //     Layout.fillWidth: true
+        //     Layout.fillHeight: true
 
-        // Player area
+        //     delegate: SongDelegate {
+        //         songIndex: index
+        //         onClicked: {
+        //             listView.currentIndex = index
+        //             player.playIndex(index)
+        //         }
+        //     }
+
+        //     onCurrentIndexChanged: {
+        //         if (currentIndex >= 0)
+        //             player.playIndex(currentIndex)
+        //     }
+        // }
+
+        // Player area (right pane)
         ColumnLayout {
             Layout.fillWidth: true
+            Layout.fillHeight: true
+            anchors.centerIn: parent
             Layout.margins: 20
             spacing: 20
 
-            // Album art (large)
+            // Album art, centered
             Image {
                 id: art
-                width: 200; height: 200
+                width: 40; height: 40
                 fillMode: Image.PreserveAspectFit
-                horizontalAlignment: Image.Center
-                // 1) Try the embedded art
-                source: "image://albumart/" + player.currentIndex
+                // Center this item in the ColumnLayout
+                Layout.alignment: Qt.AlignHCenter
 
-                // 2) If that fails, fall back to the file in qml/img/albumart.jpg
+                source: player.currentIndex >= 0
+                            ? "image://albumart/" + player.currentIndex + "?v=" + player.artVersion // pretty hacky way to do it
+                            : "qrc:/img/albumart.jpg"
                 onStatusChanged: {
-                    if (status === Image.Error) {
-                        // Qt.resolvedUrl makes it absolute relative to this QML file
+                    if (status === Image.Error)
                         art.source = Qt.resolvedUrl("img/albumart.jpg")
-                    }
                 }
+                cache: false
             }
 
-            // Song title
+            // Song title, centered
             Text {
                 text: player.currentIndex >= 0
                       ? proxy.get(player.currentIndex).title
-                      : ""
-                font.pixelSize: 20
+                      : "No Song Loaded..."
+                font.pixelSize: 30
+                // Center this item in the ColumnLayout
+                Layout.alignment: Qt.AlignHCenter
             }
 
-            // Seek slider
+            // Seek slider (now stretches full width)
             Slider {
                 id: progress
                 from: 0; to: player.duration
-                value: seeking ? value : player.position
+                // Make slider fill the ColumnLayout width
+                Layout.fillWidth: true
 
+                // Two‑way bind
+                value: seeking ? progress.value : player.position
+
+                // Handle handle press/release
                 onPressedChanged: {
-                    if (pressed) seeking = true
-                    else {
-                        seeking = false
+                    seeking = progress.pressed
+                }
+                // Handle clicks and drags anywhere on the bar
+                onValueChanged: {
+                    if (progress.pressed && !seeking) {
+                        // clicked on track
+                        player.setPosition(value)
+                    } else if (progress.pressed) {
+                        // dragging handle
                         player.setPosition(value)
                     }
                 }
@@ -131,13 +158,15 @@ ApplicationWindow {
                 spacing: 20
                 Layout.alignment: Qt.AlignHCenter
 
-                Button { text: "<<"; onClicked: player.previous() }
+                Button { text: "⏮"; onClicked: player.previous() }
                 Button {
-                    text: player.playing ? "Pause" : "Play"
-                    onClicked: player.playing ? player.pause() : player.play()
+                    text: player.playing ? "⏸ Pause" : "▶ Play"
+                    onClicked: {
+                        player.playing ? player.pause() : player.playIndex(player.currentIndex)
+                    }
                 }
-                Button { text: "Stop"; onClicked: player.stop() }
-                Button { text: ">>"; onClicked: player.next() }
+                Button { text: "■ Stop"; onClicked: player.stop() }
+                Button { text: "⏭"; onClicked: player.next() }
             }
 
             // Volume slider

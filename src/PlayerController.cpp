@@ -20,9 +20,13 @@ PlayerController::PlayerController(SongModel* model, QObject* parent)
         for (int i = 0; i < m_model->rowCount(); ++i) {
             auto idx = m_model->index(i, 0);
             QString path = m_model->data(idx, SongModel::FilePathRole).toString();
-            m_playlist.append(QUrl::fromLocalFile(path));
+            m_playlist.append(path);
         }
-        m_currentIndex = -1;
+        m_currentIndex = 0;//m_currentIndex+1;
+        newSong = true;
+        // m_player->stop();
+        // m_player->setSource(m_playlist[m_currentIndex]);
+        playIndex(m_currentIndex);
     });
 }
 
@@ -33,6 +37,23 @@ void PlayerController::play() {
         emit currentIndexChanged(m_currentIndex);
     }
     m_player->play();
+}
+
+void PlayerController::playIndex(int index) {
+    // if (index < 0 || index >= m_playlist.size()) return;
+    if(newSong || index != m_currentIndex){
+        bumpArtVersion();
+        newSong = false;
+        m_currentIndex = index;
+        m_player->setSource(m_playlist[m_currentIndex]);
+        emit currentIndexChanged(m_currentIndex);
+        // m_player->stop();
+        // emit m_player->positionChanged(0);
+
+    }else{
+        // emit currentIndexChanged(m_currentIndex);
+        m_player->play();
+    }
 }
 void PlayerController::pause() { m_player->pause(); }
 void PlayerController::stop() { m_player->stop(); }
@@ -51,13 +72,7 @@ void PlayerController::previous() {
     emit currentIndexChanged(m_currentIndex);
     m_player->play();
 }
-void PlayerController::playIndex(int index) {
-    if (index < 0 || index >= m_playlist.size()) return;
-    m_currentIndex = index;
-    m_player->setSource(m_playlist[m_currentIndex]);
-    emit currentIndexChanged(m_currentIndex);
-    m_player->play();
-}
+
 void PlayerController::setPosition(qint64 pos) {
     m_player->setPosition(pos);
 }
