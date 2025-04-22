@@ -51,7 +51,7 @@ void PlayerController::playIndex(int index) {
         // emit m_player->positionChanged(0);
 
     }else{
-        // emit currentIndexChanged(m_currentIndex);
+        emit currentIndexChanged(m_currentIndex);
         m_player->play();
     }
 }
@@ -60,17 +60,15 @@ void PlayerController::stop() { m_player->stop(); }
 
 void PlayerController::next() {
     if (m_playlist.isEmpty()) return;
-    m_currentIndex = (m_currentIndex + 1) % m_playlist.size();
-    m_player->setSource(m_playlist[m_currentIndex]);
-    emit currentIndexChanged(m_currentIndex);
-    m_player->play();
+    newSong = true;
+    const int nextIdx = (m_currentIndex + 1) % m_playlist.size();
+    playIndex(nextIdx);
 }
 void PlayerController::previous() {
     if (m_playlist.isEmpty()) return;
-    m_currentIndex = (m_currentIndex - 1 + m_playlist.size()) % m_playlist.size();
-    m_player->setSource(m_playlist[m_currentIndex]);
-    emit currentIndexChanged(m_currentIndex);
-    m_player->play();
+    newSong = true;
+    const int prevIdx = (m_currentIndex - 1 + m_playlist.size()) % m_playlist.size();
+    playIndex(prevIdx);
 }
 
 void PlayerController::setPosition(qint64 pos) {

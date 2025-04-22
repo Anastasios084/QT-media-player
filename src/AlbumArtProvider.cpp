@@ -8,7 +8,8 @@ AlbumArtProvider::AlbumArtProvider(SongModel *model)
     : QQuickImageProvider(QQuickImageProvider::Image), m_model(model) {}
 
 QImage AlbumArtProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize) {
-    bool ok; int idx = id.toInt(&ok);
+    const QString idxStr = id.section('?', 0, 0);
+    bool ok; int idx = idxStr.toInt(&ok);
     qDebug() << id;
     QImage img = m_model->albumArt(idx);
 

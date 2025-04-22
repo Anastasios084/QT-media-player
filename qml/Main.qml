@@ -92,7 +92,7 @@ ApplicationWindow {
             model: proxy
 
             delegate: Item {
-                width: parent.width
+                width: root.width
                 height: 48
                 property int srcRow: proxy.sourceIndex(index)
 
