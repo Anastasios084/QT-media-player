@@ -4,9 +4,31 @@
 #include <QEventLoop>
 #include <QUrl>
 #include <QMediaMetaData>
+#include <QDirIterator>
 
 SongModel::SongModel(QObject *parent)
     : QAbstractListModel(parent) {}
+
+void SongModel::addFolder(const QUrl &folderUrl)
+{
+    const QString folderPath = folderUrl.isLocalFile()
+                                   ? folderUrl.toLocalFile()
+                                   : folderUrl.toString(QUrl::PreferLocalFile);
+
+    QStringList files;
+    QDirIterator it(folderPath,
+                    { "*.mp3", "*.m4a", "*.flac", "*.wav", "*.ogg" },
+                    QDir::Files,
+                    QDirIterator::Subdirectories);
+
+    qDebug() << files;
+
+    qDebug() << "YESSIR";
+    while (it.hasNext())
+        files << it.next();          // collect every audio file we find
+qDebug() << "OH SHID";
+    addSongs(files);                 // re‑use the existing method
+}
 
 int SongModel::rowCount(const QModelIndex &) const {
     return m_songs.size();
@@ -48,10 +70,11 @@ QHash<int, QByteArray> SongModel::roleNames() const {
 
 void SongModel::addSongs(const QStringList &files) {
     beginResetModel();
-    m_songs.clear();
+    // m_songs.clear();
     for (const QString &file : files) {
         Song s;
         s.filePath = file;
+        qDebug() << s.filePath;
         QFileInfo info(file);
         s.title = info.baseName();
         s.artist = "";

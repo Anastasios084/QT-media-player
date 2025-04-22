@@ -15,6 +15,8 @@ struct Song {
 class SongModel : public QAbstractListModel {
     Q_OBJECT
 public:
+    Q_INVOKABLE void addFolder(const QUrl &folderUrl);
+
     enum Role { TitleRole = Qt::UserRole+1,
                 ArtistRole,
                 DurationRole,
