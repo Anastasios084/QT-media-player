@@ -10,7 +10,7 @@ ApplicationWindow {
     visible: true
     width: 1200; height: 600
     title: "MediaPlayer"
-
+    color: "#18230F"
     property bool seeking: false   // guard against binding loops in the progress slider
 
     // ---- JS helper -------------------------------------------------------
@@ -103,6 +103,7 @@ ApplicationWindow {
 
                 Text {
                     text: model.title
+                    color: "#ECF0F1"
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 12
@@ -145,6 +146,7 @@ ApplicationWindow {
         // Title text
         Text {
             text: player.currentIndex >= 0 ? proxy.get(player.currentIndex).title : "No Song Loaded…"
+            color: "#ECF0F1"
             font.pixelSize: 30
             Layout.alignment: Qt.AlignHCenter
         }
@@ -163,15 +165,15 @@ ApplicationWindow {
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             spacing: 10
-            Text { text: formatDuration(player.position) }
-            Text { text: formatDuration(player.duration) }
+            Text { text: formatDuration(player.position); color: "#ECF0F1" }
+            Text { text: formatDuration(player.duration); color: "#ECF0F1" }
         }
 
         // Playback controls
         RowLayout {
             spacing: 20
             Layout.alignment: Qt.AlignHCenter
-            Button { text: "⏮"; onClicked: player.previous() }
+            Button { text: "⏮"; onClicked: player.previous() ;}
             Button {
                 text: player.playing ? "⏸ Pause" : "▶ Play"
                 onClicked: player.playing ? player.pause() : player.playIndex(player.currentIndex)
@@ -185,7 +187,7 @@ ApplicationWindow {
                         spacing: 10
                         Layout.alignment: Qt.AlignHCenter
 
-                        Label { text: "Volume" }
+                        Label { text: "Volume" ; color: "#ECF0F1"}
                         Slider {
                             id: volumeSlider
                             from: 0; to: 100
