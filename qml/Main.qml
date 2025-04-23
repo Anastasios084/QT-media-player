@@ -98,6 +98,7 @@ ApplicationWindow {
 
         background: Rectangle {
             color: "#040f00"
+            opacity: 0.8
         }
 
         ListView {
@@ -214,7 +215,7 @@ ApplicationWindow {
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             spacing: 10
-            Text { text: formatDuration(player ? player.duration : "0:00"); color: "#ECF0F1" }
+            Text { text: formatDuration(player ? player.position : "0:00"); color: "#ECF0F1" }
             Text { text: " : "; color: "#ECF0F1"}
             Text { text: formatDuration(player ? player.duration : "0:00"); color: "#ECF0F1" }
         }
