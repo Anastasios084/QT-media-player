@@ -58,6 +58,7 @@ ApplicationWindow {
             // }
             TextField {                 // seach functionality
                 id: search
+                placeholderText: "Search..."
                 onTextChanged: {proxy.filterString = text; playlistDrawer.open();}
             }
 
