@@ -10,6 +10,14 @@ ApplicationWindow {
     visible: true
     width: 1200; height: 600
     title: "MediaPlayer"
+    // Background with gradient
+        Rectangle {
+            anchors.fill: parent
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#18230F" } // Top
+                GradientStop { position: 1.0; color: "#000000" } // Bottom
+            }
+        }
     color: "#18230F"
     property bool seeking: false   // guard against binding loops in the progress slider
 
@@ -85,23 +93,30 @@ ApplicationWindow {
         id: playlistDrawer
         edge: Qt.LeftEdge
         width: 0.30 * parent.width
-        height: root.height-header.height
+        height: root.height - header.height
         y: header.height
+
+        background: Rectangle {
+            color: "#040f00"
+        }
 
         ListView {
             id: playlistView
             anchors.fill: parent
             clip: true
             model: proxy
+            cacheBuffer: 100
 
             delegate: Item {
-                width: root.width
+                width: playlistView.width
                 height: 48
                 property int srcRow: proxy.sourceIndex(index)
 
-                Rectangle {            // highlight current track
+                // Alternating row color
+                Rectangle {
                     anchors.fill: parent
-                    color: player.currentIndex === srcRow ? "#27391C" : "transparent"
+                    color: player.currentIndex === srcRow ? "#27391C"
+                          : (index % 2 === 0 ? "#040f00" : "#0F0F0F")
                 }
 
                 Text {
@@ -122,8 +137,23 @@ ApplicationWindow {
                     }
                 }
             }
+
+            // When empty, show placeholder lines
+            Component.onCompleted: {
+                if (proxy.count === 0) {
+                    for (let i = 0; i < Math.ceil(height / 48); ++i) {
+                        playlistView.addItem({
+                            title: "",
+                            _isFake: true,
+                            index: i
+                        });
+                    }
+                }
+            }
         }
     }
+
+
 
     // ---- MAIN CONTENT ----------------------------------------------------
     ColumnLayout {
@@ -138,7 +168,7 @@ ApplicationWindow {
             width: 40; height: 40
             fillMode: Image.PreserveAspectFit
             Layout.alignment: Qt.AlignHCenter
-            source: player.currentIndex >= 0
+            source: player && player.currentIndex >= 0
                         ? "image://albumart/" + player.currentIndex + "?v=" + player.artVersion
                         : "qrc:/img/albumart.jpg"
             onStatusChanged: if (status === Image.Error)
@@ -148,7 +178,7 @@ ApplicationWindow {
 
         // Title text
         Text {
-            text: player.currentIndex >= 0 ? proxy.get(player.currentIndex).title : "No Song Loaded…"
+            text: player && player.currentIndex >= 0 ? proxy.get(player.currentIndex).title : "No Song Loaded…"
             color: "#ECF0F1"
             font.pixelSize: 30
             Layout.alignment: Qt.AlignHCenter
@@ -158,8 +188,8 @@ ApplicationWindow {
         Slider {
             id: progress
             Layout.fillWidth: true
-            from: 0; to: player.duration
-            value: seeking ? progress.value : player.position
+            from: 0; to: player ? player.duration : "0:00"
+            value: seeking ? progress.value : (player ? player.position : 0)
             onPressedChanged: seeking = pressed
             onValueChanged: if (pressed) player.setPosition(value)
 
@@ -187,9 +217,9 @@ ApplicationWindow {
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             spacing: 10
-            Text { text: formatDuration(player.position); color: "#ECF0F1" }
+            Text { text: formatDuration(player ? player.duration : "0:00"); color: "#ECF0F1" }
             Text { text: " : "; color: "#ECF0F1"}
-            Text { text: formatDuration(player.duration); color: "#ECF0F1" }
+            Text { text: formatDuration(player ? player.duration : "0:00"); color: "#ECF0F1" }
         }
 
         // Playback controls
@@ -201,7 +231,7 @@ ApplicationWindow {
                 id: play
                 width: 100
                 height: 100
-                text: player.playing ? "⏸ Pause" : "▶ Play"
+                text: player && player.playing ? "⏸ Pause" : "▶ Play"
                 font.pixelSize: 18
                 onClicked: player.playing ? player.pause() : player.playIndex(player.currentIndex)
                 // contentItem: Text {
@@ -223,7 +253,7 @@ ApplicationWindow {
                         spacing: 10
                         Layout.alignment: Qt.AlignHCenter
 
-                        Label { text: "Volume" ; color: "#ECF0F1"}
+                        Label { text: "Volume 🔉" ; color: "#ECF0F1"}
                         Slider {
                             id: volumeSlider
                             from: 0; to: 100
@@ -232,6 +262,23 @@ ApplicationWindow {
                             onValueChanged: {
                                 sliderValue = value
                                 player.volume = value
+                            }
+                            background: Rectangle {
+                                    x: volumeSlider.leftPadding
+                                    y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                                    implicitWidth: 200
+                                    implicitHeight: 4
+                                    width: volumeSlider.availableWidth
+                                    height: implicitHeight
+                                    radius: 2
+                                    color: "#3F4F44"
+
+                                    Rectangle {
+                                                width: volumeSlider.visualPosition * parent.width
+                                                height: parent.height
+                                                color: "#A4B465"
+                                                radius: 2
+                                            }
                             }
                         }
                     }
