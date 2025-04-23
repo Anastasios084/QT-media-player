@@ -115,7 +115,7 @@ ApplicationWindow {
                 // Alternating row color
                 Rectangle {
                     anchors.fill: parent
-                    color: player.currentIndex === srcRow ? "#27391C"
+                    color: player && player.currentIndex === srcRow ? "#27391C"
                           : (index % 2 === 0 ? "#040f00" : "#0F0F0F")
                 }
 
@@ -138,17 +138,14 @@ ApplicationWindow {
                 }
             }
 
-            // When empty, show placeholder lines
-            Component.onCompleted: {
-                if (proxy.count === 0) {
-                    for (let i = 0; i < Math.ceil(height / 48); ++i) {
-                        playlistView.addItem({
-                            title: "",
-                            _isFake: true,
-                            index: i
-                        });
-                    }
-                }
+            Text{
+                text: "Empty..."
+                font.pixelSize: 30
+                color: "#255F38"
+                visible: player ? player.currentIndex === -1 : true
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+
             }
         }
     }
