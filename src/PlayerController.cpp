@@ -22,7 +22,7 @@ PlayerController::PlayerController(SongModel* model, QObject* parent)
             QString path = m_model->data(idx, SongModel::FilePathRole).toString();
             m_playlist.append(path);
         }
-        m_currentIndex = 0;//m_currentIndex+1;
+        m_currentIndex = 0;//m_currentIndex+1; // PROBABLY WILL CHANGE IT
         newSong = true;
         // m_player->stop();
         // m_player->setSource(m_playlist[m_currentIndex]);
@@ -31,6 +31,7 @@ PlayerController::PlayerController(SongModel* model, QObject* parent)
 }
 
 void PlayerController::play() {
+    qDebug() << "PLAY WAS CALLED!!!!!!!";
     if (m_currentIndex < 0 && !m_playlist.isEmpty()) {
         m_currentIndex = 0;
         m_player->setSource(m_playlist[0]);
@@ -46,9 +47,17 @@ void PlayerController::playIndex(int index) {
         newSong = false;
         m_currentIndex = index;
         m_player->setSource(m_playlist[m_currentIndex]);
+        connect(m_player, &QMediaPlayer::mediaStatusChanged, this,
+                [this](QMediaPlayer::MediaStatus s){
+                    if (s == QMediaPlayer::LoadedMedia){
+                        m_player->stop();
+                    }
+                }, Qt::SingleShotConnection); // big brain move
         emit currentIndexChanged(m_currentIndex);
-        // m_player->stop();
-        // emit m_player->positionChanged(0);
+        // m_player->play();
+        m_player->setPosition(0);
+        emit m_player->positionChanged(0);
+
 
     }else{
         emit currentIndexChanged(m_currentIndex);
@@ -60,13 +69,13 @@ void PlayerController::stop() { m_player->stop(); }
 
 void PlayerController::next() {
     if (m_playlist.isEmpty()) return;
-    newSong = true;
+    // newSong = true;
     const int nextIdx = (m_currentIndex + 1) % m_playlist.size();
     playIndex(nextIdx);
 }
 void PlayerController::previous() {
     if (m_playlist.isEmpty()) return;
-    newSong = true;
+    // newSong = true;
     const int prevIdx = (m_currentIndex - 1 + m_playlist.size()) % m_playlist.size();
     playIndex(prevIdx);
 }
