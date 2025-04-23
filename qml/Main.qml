@@ -44,30 +44,25 @@ ApplicationWindow {
             spacing: 10
 
             ToolButton {               // toggle playlist drawer
-                text: "songs \u2630"        // ≡
+                text: "Loaded Songs \u2630"        // ≡
                 onClicked: playlistDrawer.open()
             }
 
             ToolButton {               // pick music folder
-                text: "\ud83d\udcc1" // 📁
+                text: "Add from \ud83d\udcc1" // 📁
                 onClicked: folderDialog.open()
             }
-
-            // NOPE, not today
-            // TextField {
-            //     id: searchField
-            //     placeholderText: "Search…"
-            //     Layout.fillWidth: true
-            //     onTextChanged: proxy.filterString = text
+            // ListView {
+            //     model: proxy
+            //     delegate: Text { text: title + " — " + artist }
             // }
-
-            // ComboBox {
-            //     model: ["Title", "Artist"]
-            //     onCurrentIndexChanged: proxy.sort(0, Qt.AscendingOrder)
-            // }
+            TextField {                 // seach functionality
+                id: search
+                onTextChanged: {proxy.filterString = text; playlistDrawer.open();}
+            }
 
             Button {                   // pick individual files (old behaviour)
-                text: "Add Songs"
+                text: "Add Song"
                 onClicked: fileDialog.open()
             }
         }
@@ -84,7 +79,6 @@ ApplicationWindow {
     FolderDialog {                      // add entire folder
         id: folderDialog
         title: "Select Music Folder"
-        // selectFolder: true
         onAccepted: songModel.addFolder(folderDialog.selectedFolder)
     }
 
@@ -100,6 +94,9 @@ ApplicationWindow {
             color: "#040f00"
             opacity: 0.8
         }
+
+        onOpened: {search.forceActiveFocus()}
+        onClosed: {search.focus = false}
 
         ListView {
             id: playlistView

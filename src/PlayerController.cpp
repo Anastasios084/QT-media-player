@@ -31,7 +31,6 @@ PlayerController::PlayerController(SongModel* model, QObject* parent)
 }
 
 void PlayerController::play() {
-    qDebug() << "PLAY WAS CALLED!!!!!!!";
     if (m_currentIndex < 0 && !m_playlist.isEmpty()) {
         m_currentIndex = 0;
         m_player->setSource(m_playlist[0]);
@@ -69,13 +68,11 @@ void PlayerController::stop() { m_player->stop(); }
 
 void PlayerController::next() {
     if (m_playlist.isEmpty()) return;
-    // newSong = true;
     const int nextIdx = (m_currentIndex + 1) % m_playlist.size();
     playIndex(nextIdx);
 }
 void PlayerController::previous() {
     if (m_playlist.isEmpty()) return;
-    // newSong = true;
     const int prevIdx = (m_currentIndex - 1 + m_playlist.size()) % m_playlist.size();
     playIndex(prevIdx);
 }

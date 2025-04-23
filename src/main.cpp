@@ -14,9 +14,13 @@ int main(int argc, char *argv[]) {
         "qt.multimedia.ffmpeg.warning=false\n"
         "qt.multimedia.ffmpeg.info=false"
         );
+
+    // Init GUI
     QGuiApplication app(argc, argv);
 
+    // Expose SongModel to QML (uncreatable gives enum access)
     qmlRegisterUncreatableType<SongModel>("MediaPlayer", 1, 0, "SongModel", "Reference only");
+    // Expose filter proxy model to QML
     qmlRegisterType<SongFilterProxyModel>("MediaPlayer", 1, 0, "SongFilterProxyModel");
 
     QQmlApplicationEngine engine;

@@ -21,12 +21,9 @@ void SongModel::addFolder(const QUrl &folderUrl)
                     QDir::Files,
                     QDirIterator::Subdirectories);
 
-    qDebug() << files;
 
-    qDebug() << "YESSIR";
     while (it.hasNext())
         files << it.next();          // collect every audio file we find
-qDebug() << "OH SHID";
     addSongs(files);                 // re‑use the existing method
 }
 
@@ -45,18 +42,6 @@ QVariant SongModel::data(const QModelIndex &idx, int role) const {
     default:           return {};
     }
 }
-// QVariant SongModel::data(const QModelIndex &idx, int role) const {
-//     if (!idx.isValid() || idx.row() >= m_songs.size())
-//         return {};
-//     const Song &s = m_songs.at(idx.row());
-//     switch (role) {
-//     case TitleRole:    return s.title;
-//     case ArtistRole:   return s.artist;
-//     case DurationRole: return s.duration;
-//     case FilePathRole: return s.filePath;
-//     default:           return {};
-//     }
-// }
 
 QHash<int, QByteArray> SongModel::roleNames() const {
     return {
@@ -88,31 +73,22 @@ void SongModel::addSongs(const QStringList &files) {
                          &loop, [&](auto status){ if (status == QMediaPlayer::LoadedMedia) loop.quit(); });
         loop.exec();
         s.duration = tmp.duration();
+
         auto meta = tmp.metaData();
         auto artistVar = meta.value(QMediaMetaData::ContributingArtist);
         if (artistVar.canConvert<QString>())
             s.artist = artistVar.toString();
+
         auto artVar = meta.value(QMediaMetaData::ThumbnailImage);
-        qDebug() << artVar;
         if (artVar.canConvert<QImage>()){
-            qDebug() << "ENTERED";
             s.albumArt = artVar.value<QImage>();
         }
-        if(!s.albumArt.save("/Users/tasos/Documents/projects/QT/QT-media-player/test.jpg")){
-            qDebug("SAVE FAILED");
-        }
-        qDebug() << s.albumArt;
-        qDebug() << s.artist;
         m_songs.append(s);
-        qDebug() << "SONG MODEL LOOP";
-
     }
     endResetModel();
     emit songsAdded();
-    qDebug() << "SONG MODEL FINISHED";
 }
 
 QImage SongModel::albumArt(int index) const {
-    qDebug() << "PAMEEEE";
     return (index >= 0 && index < m_songs.size()) ? m_songs[index].albumArt : QImage();
 }
