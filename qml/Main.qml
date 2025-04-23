@@ -29,6 +29,7 @@ ApplicationWindow {
 
     // ---- HEADER BAR ------------------------------------------------------
     header: ToolBar {
+        id:header
         RowLayout {
             Layout.fillWidth: true
             Layout.margins: 10
@@ -84,7 +85,8 @@ ApplicationWindow {
         id: playlistDrawer
         edge: Qt.LeftEdge
         width: 0.30 * parent.width
-        height: root.height
+        height: root.height-header.height
+        y: header.height
 
         ListView {
             id: playlistView
@@ -160,6 +162,25 @@ ApplicationWindow {
             value: seeking ? progress.value : player.position
             onPressedChanged: seeking = pressed
             onValueChanged: if (pressed) player.setPosition(value)
+
+            background: Rectangle {
+                    x: progress.leftPadding
+                    y: progress.topPadding + progress.availableHeight / 2 - height / 2
+                    implicitWidth: 200
+                    implicitHeight: 4
+                    width: progress.availableWidth
+                    height: implicitHeight
+                    radius: 2
+                    color: "#3F4F44"
+
+                    Rectangle {
+                                width: progress.visualPosition * parent.width
+                                height: parent.height
+                                color: "#A4B465"
+                                radius: 2
+                            }
+            }
+
         }
 
         // Time stamps
@@ -178,9 +199,10 @@ ApplicationWindow {
             Button { text: "⏮"; onClicked: player.previous()}
             Button {
                 id: play
-                // width: 100
-                // height: 100
+                width: 100
+                height: 100
                 text: player.playing ? "⏸ Pause" : "▶ Play"
+                font.pixelSize: 18
                 onClicked: player.playing ? player.pause() : player.playIndex(player.currentIndex)
                 // contentItem: Text {
                 //     text: player.playing ? "⏸" : "▶"
@@ -192,7 +214,7 @@ ApplicationWindow {
                 // }
 
             }
-            Button { text: "■ Stop"; onClicked: player.stop() }
+            Button { text: "■ Stop"; onClicked: player.stop();font.pixelSize: 18}
             Button { text: "⏭"; onClicked: player.next() }
         }
 
