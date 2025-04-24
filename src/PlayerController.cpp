@@ -37,6 +37,27 @@ PlayerController::PlayerController(SongModel* model, QObject* parent)
     });
 }
 
+static QColor averageColor(const QImage &img)          // tiny & fast
+{
+    if (img.isNull())                     // fall-back to your old colour
+        return QColor("#18230F");
+
+    // 1×1 down-scale = arithmetic mean of all pixels
+    QImage one = img.convertToFormat(QImage::Format_RGB32)
+                     .scaled(1, 1, Qt::IgnoreAspectRatio,
+                             Qt::SmoothTransformation);
+    return QColor::fromRgb(one.pixel(0, 0));
+}
+
+void PlayerController::updateThemeColor()
+{
+    QColor c = averageColor(m_model->albumArt(m_currentIndex));
+    if (c != m_themeColor) {             // suppress duplicate signals
+        m_themeColor = c;
+        emit themeColorChanged();
+    }
+}
+
 void PlayerController::play() {
     // If nothing has been loaded yet, start with the first track
     if (m_currentIndex < 0 && !m_playlist.isEmpty()) {
@@ -56,6 +77,9 @@ void PlayerController::playIndex(int index) {
 
         // Set the media source to the selected file
         m_player->setSource(m_playlist[m_currentIndex]);
+
+        // new addition - Color change
+        updateThemeColor();
 
         // Wait for media to load before updating position - timing issue fix
         connect(m_player, &QMediaPlayer::mediaStatusChanged, this,

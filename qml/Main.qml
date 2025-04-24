@@ -10,15 +10,26 @@ ApplicationWindow {
     visible: true
     width: 1200; height: 600
     title: "MediaPlayer"
+
+    // Smooth transition whenever the C++ property changes
+    property color topTint: player ? player.themeColor : "#18230F"
+
     // Background with gradient
-        Rectangle {
+    Rectangle {
             anchors.fill: parent
             gradient: Gradient {
-                GradientStop { position: 0.0; color: "#18230F" } // Top
-                GradientStop { position: 1.0; color: "#000000" } // Bottom
+                GradientStop {
+                    id: topStop
+                    position: 0.0
+                    color: root.topTint                  // bind to property
+                    Behavior on color {                 // animate the change
+                        ColorAnimation { duration: 400 }
+                    }
+                }
+                GradientStop { position: 1.0; color: "#000000" }
             }
         }
-    color: "#18230F"
+    // color: "#18230F"
     property bool seeking: false   // guard against binding loops in the progress slider
 
     // ---- JS helper -------------------------------------------------------
@@ -109,8 +120,8 @@ ApplicationWindow {
         y: header.height
 
         background: Rectangle {
-            color: "#040f00"
-            opacity: 0.8
+            color: "#2C2C2C"
+            opacity: 0.7
         }
 
         onOpened: {search.forceActiveFocus()}
@@ -214,7 +225,7 @@ ApplicationWindow {
                     width: progress.availableWidth
                     height: implicitHeight
                     radius: 2
-                    color: "#3F4F44"
+                    color: root.topTint
 
                     Rectangle {
                                 width: progress.visualPosition * parent.width

@@ -6,6 +6,7 @@
 #include <QAudioOutput>
 #include <QUrl>
 #include "SongModel.h"
+#include <QColor>
 
 class PlayerController : public QObject {
     Q_OBJECT
@@ -15,6 +16,7 @@ class PlayerController : public QObject {
     Q_PROPERTY(int volume READ volume WRITE setVolume NOTIFY volumeChanged)
     Q_PROPERTY(int currentIndex READ currentIndex NOTIFY currentIndexChanged)
     Q_PROPERTY(int artVersion READ artVersion NOTIFY artVersionChanged)
+    Q_PROPERTY(QColor themeColor READ themeColor NOTIFY themeColorChanged)
 
 public:
     explicit PlayerController(SongModel* model, QObject *parent = nullptr);
@@ -32,8 +34,11 @@ public:
     void setVolume(int vol);
     int currentIndex() const;
     int artVersion() const { return m_artVersion; }
+    Q_PROPERTY(QColor themeColor READ themeColor NOTIFY themeColorChanged)
+    QColor themeColor() const { return m_themeColor; }
 
 signals:
+    void themeColorChanged();
     void positionChanged(qint64);
     void durationChanged(qint64);
     void playingChanged(bool);
@@ -42,6 +47,7 @@ signals:
     void artVersionChanged();
 private:
     void bumpArtVersion(){ ++m_artVersion; emit artVersionChanged();}
+    void updateThemeColor();
 
     SongModel *m_model;
     QMediaPlayer *m_player;
@@ -50,6 +56,7 @@ private:
     int m_currentIndex{-1};
     int m_artVersion = 0;
     bool newSong;
+    QColor m_themeColor { QColor("#18230F") };
 };
 
 #endif
