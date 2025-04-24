@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.3
 import QtQuick.Dialogs
 import QtQml.Models 2.15
 import MediaPlayer 1.0
-
+import QtQuick.Effects
 ApplicationWindow {
     id: root
     visible: true
@@ -187,18 +187,36 @@ ApplicationWindow {
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
         // Album art
-        Image {
-            id: art
-            width: 40; height: 40
-            fillMode: Image.PreserveAspectFit
+        Item{
+            width: 270; height: 270 // this is from ksize, could be given
             Layout.alignment: Qt.AlignHCenter
-            source: player && player.currentIndex >= 0
-                        ? "image://albumart/" + player.currentIndex + "?v=" + player.artVersion
-                        : "qrc:/img/albumart.jpg"
-            onStatusChanged: if (status === Image.Error)
-                                 art.source = Qt.resolvedUrl("img/albumart.jpg")
-            cache: false
+            Image {
+                id: art
+                fillMode: Image.PreserveAspectFit
+
+                source: player && player.currentIndex >= 0
+                            ? "image://albumart/" + player.currentIndex + "?v=" + player.artVersion
+                            : "qrc:/img/albumart.jpg"
+                onStatusChanged: if (status === Image.Error)
+                                     art.source = Qt.resolvedUrl("img/albumart.jpg")
+                cache: false
+                layer.enabled: true
+            }
+
+            MultiEffect {
+                anchors.fill: art
+
+                source: art
+                shadowBlur: 1.5
+                shadowEnabled: true
+                shadowColor: "black"
+                shadowVerticalOffset: 0
+                shadowHorizontalOffset: 4
+
+            }
         }
+
+
 
         // Title text
         Text {
@@ -241,9 +259,9 @@ ApplicationWindow {
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             spacing: 10
-            Text { text: formatDuration(player ? player.position : "0:00"); color: "#ECF0F1" }
-            Text { text: " : "; color: "#ECF0F1"}
-            Text { text: formatDuration(player ? player.duration : "0:00"); color: "#ECF0F1" }
+            Text { text: formatDuration(player ? player.position : "0:00"); color: "#ECF0F1"; font.pixelSize: 15}
+            Text { text: " : "; color: "#ECF0F1"; font.pixelSize: 15}
+            Text { text: formatDuration(player ? player.duration : "0:00"); color: "#ECF0F1"; font.pixelSize: 15 }
         }
 
         // Playback controls
@@ -295,7 +313,7 @@ ApplicationWindow {
                                     width: volumeSlider.availableWidth
                                     height: implicitHeight
                                     radius: 2
-                                    color: "#3F4F44"
+                                    color: root.topTint
 
                                     Rectangle {
                                                 width: volumeSlider.visualPosition * parent.width
