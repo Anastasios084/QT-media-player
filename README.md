@@ -16,7 +16,7 @@ This media player has the following features
 
 BUILD INSTRUCTIONS
 - Clone the project
-- Open it through QT creator
+- Open the project (MediaPlayer.pro) through QT creator
 - Build (USE Qt 6.9)
 - Run
 
