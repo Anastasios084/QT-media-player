@@ -19,5 +19,6 @@ BUILD INSTRUCTIONS
 - Run
 
 Find below a video showcasing all the features:
-https://github.com/user-attachments/assets/02efb5c2-dcf2-43c6-b2a3-f83d11f7d943
+<video src='https://github.com/user-attachments/assets/02efb5c2-dcf2-43c6-b2a3-f83d11f7d943' width=180/>
+
 
