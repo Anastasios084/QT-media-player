@@ -1,6 +1,8 @@
 # QT-media-player
 This is a Media player created using only Qt 6.9 and QML with QtQuick 2.15. Using the default theme.
 
+The project has been tested successfully on a mac and linux computer.
+
 This media player has the following features
 - Basic capabilites such as: Play, Pause, Stop, Skip Next, Skip Previous
 - Displays current song playing and playback time
