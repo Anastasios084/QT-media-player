@@ -23,16 +23,22 @@ int main(int argc, char *argv[]) {
     // Expose filter proxy model to QML
     qmlRegisterType<SongFilterProxyModel>("MediaPlayer", 1, 0, "SongFilterProxyModel");
 
+    // Setup QML engine and core data/controller objects
     QQmlApplicationEngine engine;
     SongModel songModel;
     PlayerController controller(&songModel);
 
+    // Expose objects to QML
     engine.rootContext()->setContextProperty("songModel", &songModel);
     engine.rootContext()->setContextProperty("player", &controller);
 
+    // Provide album art images to QML using the "albumart" image provider
     engine.addImageProvider(QLatin1String("albumart"), new AlbumArtProvider(&songModel));
 
+    // Load the main QML UI from the application resources
     engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
+
+    // If QML failed to load any root objects (e.g., file not found), exit with error
     if (engine.rootObjects().isEmpty())
         return -1;
 

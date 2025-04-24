@@ -62,7 +62,7 @@ void SongModel::addSongs(const QStringList &files) {
         qDebug() << s.filePath;
         QFileInfo info(file);
         s.title = info.baseName();
-        s.artist = "";
+        s.artist = "Unknown";
         s.duration = 0;
         s.albumArt = QImage();
 

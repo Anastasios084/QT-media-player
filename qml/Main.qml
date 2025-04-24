@@ -33,6 +33,8 @@ ApplicationWindow {
     SongFilterProxyModel {
         id: proxy
         sourceModel: songModel       // from C++
+        filterString:    search.text        // already there
+        filterMode:      SongFilterProxyModel.TitleOrArtist   // new (default)
     }
 
     // ---- HEADER BAR ------------------------------------------------------
@@ -61,6 +63,21 @@ ApplicationWindow {
                 placeholderText: "Search..."
                 onTextChanged: {proxy.filterString = text; playlistDrawer.open();}
             }
+            ComboBox {
+                    id: fieldChooser
+                    model: [
+                        { text: qsTr("Title"),  mode: SongFilterProxyModel.TitleOnly     },
+                        { text: qsTr("Artist"), mode: SongFilterProxyModel.ArtistOnly    },
+                        { text: qsTr("Both"),   mode: SongFilterProxyModel.TitleOrArtist }
+                    ]
+                    textRole: "text"
+                    onActivated: function(index) {
+                        proxy.filterMode = model[index].mode
+                    }
+                    // keep the proxy up-to-date if user reopens the page:
+                    Component.onCompleted: proxy.filterMode = model[currentIndex].mode
+                    width: 100
+                }
 
             Button {                   // pick individual files (old behaviour)
                 text: "Add Song"
@@ -119,7 +136,7 @@ ApplicationWindow {
                 }
 
                 Text {
-                    text: model.title
+                    text: model.title + " - " + model.artist
                     color: "#ECF0F1"
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
