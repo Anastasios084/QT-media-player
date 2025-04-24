@@ -32,6 +32,14 @@ QImage AlbumArtProvider::requestImage(const QString &id, QSize *size, const QSiz
                          Qt::KeepAspectRatioByExpanding,  // crop the overhang
                          Qt::SmoothTransformation);
     }
+
+    if (img.size() != target) {
+        // centre-crop to target rectangle
+        const int x = (img.width()  - target.width())  / 2;
+        const int y = (img.height() - target.height()) / 2;
+        img = img.copy(x, y, target.width(), target.height());
+    }
+
     // check for custom size
     if (size) *size = img.size();
     return img;
